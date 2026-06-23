@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>职场版《甄嬛传》人格测试</title>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --dark-red: #8b1a1a;
+    --deep-red: #6b0f0f;
+    --cream: #fdf6e3;
+    --ink: #2c1810;
+    --light-gold: #f0d080;
+    --bg-dark: #1a0a05;
+    --card-bg: rgba(253, 246, 227, 0.95);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'STSong', 'SimSun', 'Songti SC', 'Source Han Serif SC', serif;
+    background: var(--bg-dark);
+    min-height: 100vh;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* 背景装饰 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(139,26,26,0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(26,10,5,1) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  /* 顶部标题区 */
+  .hero {
+    text-align: center;
+    padding: 48px 20px 36px;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--dark-red), var(--deep-red));
+    color: var(--light-gold);
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 5px 18px;
+    border: 1px solid var(--gold);
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(26px, 6vw, 42px);
+    color: var(--light-gold);
+    text-shadow: 0 0 30px rgba(201,168,76,0.5), 2px 2px 0 rgba(0,0,0,0.5);
+    line-height: 1.3;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+
+  .hero h1 span {
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    color: rgba(240,208,128,0.7);
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    color: var(--gold);
+    opacity: 0.6;
+    font-size: 18px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+
+  /* 进度条 */
+  .progress-wrap {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .progress-label {
+    color: var(--gold);
+    font-size: 13px;
+    white-space: nowrap;
+    min-width: 70px;
+  }
+
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--dark-red), var(--gold));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* 题目卡片 */
+  .question-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 4px;
+    padding: 32px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.5);
+    position: relative;
+    overflow: hidden;
+    display: none;
+  }
+
+  .question-card.active { display: block; animation: fadeSlide 0.4s ease; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(to right, var(--dark-red), var(--gold), var(--dark-red));
+  }
+
+  .q-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--dark-red), var(--deep-red));
+    color: var(--light-gold);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 50%;
+    margin-bottom: 14px;
+    border: 1px solid var(--gold);
+    flex-shrink: 0;
+  }
+
+  .q-text {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--ink);
+    margin-bottom: 22px;
+    font-weight: 600;
+  }
+
+  /* 选项 */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1.5px solid rgba(139,26,26,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(255,255,255,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option:hover {
+    border-color: var(--dark-red);
+    background: rgba(139,26,26,0.06);
+    transform: translateX(4px);
+  }
+
+  .option.selected {
+    border-color: var(--dark-red);
+    background: linear-gradient(135deg, rgba(139,26,26,0.1), rgba(201,168,76,0.08));
+    box-shadow: 0 2px 12px rgba(139,26,26,0.15);
+  }
+
+  .option.selected::after {
+    content: '✓';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dark-red);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .opt-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, var(--dark-red), var(--deep-red));
+    color: var(--light-gold);
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .opt-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #3a2010;
+    flex: 1;
+  }
+
+  /* 按钮 */
+  .btn-wrap { display: flex; justify-content: flex-end; margin-top: 24px; gap: 12px; }
+
+  .btn {
+    padding: 11px 32px;
+    font-size: 15px;
+    font-family: inherit;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--dark-red), var(--deep-red));
+    color: var(--light-gold);
+    border: 1px solid var(--gold);
+    box-shadow: 0 4px 15px rgba(139,26,26,0.3);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #a02020, var(--dark-red));
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(139,26,26,0.4);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.4);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.08);
+  }
+
+  /* 结果页 */
+  #result-page { display: none; }
+
+  .result-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,168,76,0.5);
+    border-radius: 4px;
+    padding: 40px 32px;
+    text-align: center;
+    box-shadow: 0 12px 50px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+    animation: fadeSlide 0.6s ease;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(to right, var(--dark-red), var(--gold), var(--dark-red));
+  }
+
+  .result-emoji {
+    font-size: 72px;
+    margin-bottom: 16px;
+    display: block;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+  }
+
+  .result-role {
+    font-size: 13px;
+    color: var(--dark-red);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .result-name {
+    font-size: clamp(28px, 7vw, 44px);
+    color: var(--ink);
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+  }
+
+  .result-title {
+    font-size: 16px;
+    color: var(--dark-red);
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .result-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 0 auto 20px;
+  }
+
+  .result-desc {
+    font-size: 15px;
+    line-height: 1.9;
+    color: #4a2c1a;
+    text-align: left;
+    background: rgba(139,26,26,0.04);
+    border-left: 3px solid var(--dark-red);
+    padding: 16px 18px;
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 20px;
+  }
+
+  .result-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .tag {
+    background: linear-gradient(135deg, rgba(139,26,26,0.1), rgba(201,168,76,0.1));
+    border: 1px solid rgba(139,26,26,0.25);
+    color: var(--dark-red);
+    font-size: 13px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* 彩蛋 */
+  .easter-egg {
+    background: linear-gradient(135deg, rgba(139,26,26,0.08), rgba(201,168,76,0.08));
+    border: 1px dashed rgba(201,168,76,0.5);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #5a3020;
+    line-height: 1.8;
+  }
+
+  .easter-egg strong { color: var(--dark-red); }
+
+  /* 分数条 */
+  .score-breakdown {
+    margin: 24px 0;
+    text-align: left;
+  }
+
+  .score-breakdown h3 {
+    font-size: 14px;
+    color: var(--dark-red);
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .score-name {
+    font-size: 13px;
+    color: var(--ink);
+    width: 60px;
+    flex-shrink: 0;
+  }
+
+  .score-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: rgba(139,26,26,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--dark-red), var(--gold));
+    border-radius: 4px;
+    transition: width 1s ease 0.3s;
+  }
+
+  .score-num {
+    font-size: 12px;
+    color: var(--dark-red);
+    width: 20px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* 重新测试 */
+  .restart-wrap {
+    text-align: center;
+    margin-top: 28px;
+  }
+
+  /* 开始页 */
+  #start-page {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .start-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 4px;
+    padding: 40px 32px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .start-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(to right, var(--dark-red), var(--gold), var(--dark-red));
+  }
+
+  .start-intro {
+    font-size: 15px;
+    line-height: 2;
+    color: #4a2c1a;
+    margin-bottom: 28px;
+  }
+
+  .char-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .char-item {
+    background: linear-gradient(135deg, rgba(139,26,26,0.08), rgba(201,168,76,0.06));
+    border: 1px solid rgba(139,26,26,0.2);
+    border-radius: 4px;
+    padding: 12px 6px;
+    font-size: 13px;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .char-item .char-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+  .char-item .char-name { font-weight: 700; color: var(--dark-red); }
+  .char-item .char-tag { font-size: 11px; color: #7a5040; }
+
+  @media (max-width: 480px) {
+    .char-grid { grid-template-columns: repeat(2, 1fr); }
+    .question-card { padding: 24px 18px; }
+    .result-card { padding: 32px 20px; }
+    .start-card { padding: 28px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 顶部标题 -->
+  <div class="hero">
+    <div class="hero-badge">美团员工专属 · 职场人格测试</div>
+    <h1>你在美团打工<br>其实是<span>《甄嬛传》</span>里的谁？</h1>
+    <p class="hero-sub">10道职场情景题，揭开你的宫廷人格</p>
+  </div>
+
+  <!-- 开始页 -->
+  <div id="start-page">
+    <div class="start-card">
+      <p class="start-intro">
+        同样是在"宫里"打工，<br>
+        有人步步为营，有人宁折不弯，<br>
+        有人八面玲珑，有人向往自由……<br>
+        <strong>你，是哪一位？</strong>
+      </p>
+
+      <div class="char-grid">
+        <div class="char-item">
+          <span class="char-emoji">🌸</span>
+          <div class="char-name">甄嬛</div>
+          <div class="char-tag">职场逆袭女王</div>
+        </div>
+        <div class="char-item">
+          <span class="char-emoji">💙</span>
+          <div class="char-name">眉庄</div>
+          <div class="char-tag">理想主义者</div>
+        </div>
+        <div class="char-item">
+          <span class="char-emoji">🌿</span>
+          <div class="char-name">安陵容</div>
+          <div class="char-tag">内卷焦虑体</div>
+        </div>
+        <div class="char-item">
+          <span class="char-emoji">🔥</span>
+          <div class="char-name">华妃</div>
+          <div class="char-tag">职场强势派</div>
+        </div>
+        <div class="char-item">
+          <span class="char-emoji">🌙</span>
+          <div class="char-name">果郡王</div>
+          <div class="char-tag">浪漫逃离者</div>
+        </div>
+        <div class="char-item">
+          <span class="char-emoji">🩺</span>
+          <div class="char-name">温实初</div>
+          <div class="char-tag">职场老实人</div>
+        </div>
+        <div class="char-item">
+          <span class="char-emoji">🪭</span>
+          <div class="char-name">苏培盛</div>
+          <div class="char-tag">信息中枢</div>
+        </div>
+        <div class="char-item">
+          <span class="char-emoji">👑</span>
+          <div class="char-name">皇帝</div>
+          <div class="char-tag">隐藏款彩蛋</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="startQuiz()" style="padding:14px 48px;font-size:16px;letter-spacing:2px;">
+        开始测试 →
+      </button>
+    </div>
+  </div>
+
+  <!-- 答题页 -->
+  <div id="quiz-page" style="display:none;">
+    <div class="progress-wrap">
+      <span class="progress-label" id="progress-label">第 1 / 10 题</span>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div id="questions-container"></div>
+
+    <div class="btn-wrap">
+      <button class="btn btn-ghost" id="btn-prev" onclick="prevQ()" style="display:none;">← 上一题</button>
+      <button class="btn btn-primary" id="btn-next" onclick="nextQ()" disabled>下一题 →</button>
+    </div>
+  </div>
+
+  <!-- 结果页 -->
+  <div id="result-page">
+    <div class="result-card" id="result-content"></div>
+    <div class="restart-wrap">
+      <button class="btn btn-ghost" onclick="restartQuiz()" style="margin-top:16px;">↺ 重新测试</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ROLES = {
+  zhen:  { name: '甄嬛',  emoji: '🌸', title: '职场逆袭女王',   tags: ['高情商','能屈能伸','步步为营','终将赢得一切'] },
+  mei:   { name: '眉庄',  emoji: '💙', title: '职场理想主义者', tags: ['有原则','不妥协','宁折不弯','清醒自知'] },
+  an:    { name: '安陵容',emoji: '🌿', title: '职场内卷焦虑体', tags: ['讨好型','努力但不安','内耗严重','渴望被认可'] },
+  hua:   { name: '华妃',  emoji: '🔥', title: '职场强势派',     tags: ['直接霸道','背景硬','不藏着掖着','说到做到'] },
+  guo:   { name: '果郡王',emoji: '🌙', title: '职场浪漫逃离者', tags: ['不爱内卷','向往自由','活在自己世界','诗和远方'] },
+  wen:   { name: '温实初',emoji: '🩺', title: '职场老实人',     tags: ['默默付出','不争不抢','容易被忽视','真诚可靠'] },
+  su:    { name: '苏培盛',emoji: '🪭', title: '职场信息中枢',   tags: ['八面玲珑','消息灵通','左右逢源','职场老油条'] },
+  emperor: { name: '皇帝', emoji: '👑', title: '职场画饼大师（隐藏款）', tags: ['表面公平','实则偏心','擅长PUA','你不是在打工你是在管人'] }
+};
+
+const DESCS = {
+  zhen: '你是职场里最懂得审时度势的人。面对压力你不会硬刚，而是先蛰伏、再出击。你情商极高，能在复杂的人际关系中找到最优解，也懂得在合适的时机展示自己的价值。同事们可能觉得你"好说话"，但只有你自己知道，你从未放弃过自己的目标。职场路上，你走得慢，但走得稳，最终赢得一切。',
+  mei:  '你是职场里最有原则的人。你清楚地知道自己要什么、不要什么，绝不为了利益委屈自己。面对不公平，你会直接说出来，哪怕代价是得罪人。你的存在让职场多了一份清醒和骨气。有时候你会觉得孤独，但那些真正懂你的人，会一直在你身边。',
+  an:   '你是职场里最努力也最焦虑的人。你害怕被忽视，所以拼命表现；你害怕被超越，所以不停内卷。你的付出是真实的，但你的不安全感也是真实的。其实你不需要那么用力——你已经足够好了，只是还没学会相信这一点。试着放松一点，你会发现世界没那么危险。',
+  hua:  '你是职场里最直接的人。你不喜欢绕弯子，有话直说，有情绪直接表达。你的强势背后是真实的自信，你知道自己要什么，也有能力拿到。有时候你的方式会让人不舒服，但没有人敢小看你。你的存在让职场少了很多虚伪，多了一份痛快。',
+  guo:  '你是职场里最有灵魂的人。你不在乎排名和绩效，你在乎的是这件事有没有意义、有没有趣。你有自己的节奏，不愿意被系统裹挟。有时候你会显得"不上进"，但那只是因为你的追求在别处。你最大的风险是——在一个不懂你的地方，消耗了太多时间。',
+  wen:  '你是职场里最可靠的人。你不争不抢，默默把事情做好，是团队里真正的压舱石。你不擅长表现自己，但你的价值是实实在在的。有时候你会觉得付出没有被看见，那是因为你还没学会适当地"让别人看见你"。你值得被更好地对待。',
+  su:   '你是职场里最消息灵通的人。你知道谁和谁关系好，知道哪个项目要黄，知道老板最近在想什么。你八面玲珑，谁都不得罪，在任何环境里都能活得很好。你的核心竞争力是"信息差"和"关系网"。只要你在，团队的信息流通效率就会高很多。',
+  emperor: '恭喜你，你是那个<strong>表面关心员工、实则只爱项目的老板本人</strong>。你不是在打工，你是在管人！你擅长画饼，偶尔偏心，但你也真的在乎大局。你的下属又爱又怕你，因为你既能给机会，也能让人猝不及防地"被重点培养"。'
+};
+
+const QUESTIONS = [
+  {
+    q: 'Q1. 周五下午5点，老板突然在群里@全员说"明天周六来公司，有重要项目"，你的第一反应是？',
+    opts: [
+      { text: '默默打开日历，把周末计划全部清空，准时到场', role: 'an' },
+      { text: '私聊老板问清楚背景，评估一下是否真的有必要', role: 'zhen' },
+      { text: '直接在群里回"我有事来不了"，后果自负', role: 'hua' },
+      { text: '已读不回，第二天再说', role: 'guo' },
+      { text: '悄悄问同事"你去吗"，观望一下再决定', role: 'su' }
+    ]
+  },
+  {
+    q: 'Q2. 你发现同组同事把你的方案改了个名字，作为自己的成果汇报给了老板，你会？',
+    opts: [
+      { text: '当场在会议室指出来，绝不忍气吞声', role: 'mei' },
+      { text: '先忍着，私下找机会让老板知道真相', role: 'zhen' },
+      { text: '直接找那个同事对峙，语气不太好', role: 'hua' },
+      { text: '算了，懒得计较，下次注意就好', role: 'wen' },
+      { text: '心里难受但什么都没说，回家哭了一场', role: 'an' }
+    ]
+  },
+  {
+    q: 'Q3. 公司组织团建，你最可能是哪种状态？',
+    opts: [
+      { text: '提前做好攻略，把所有环节都安排得明明白白', role: 'zhen' },
+      { text: '全程配合，笑容满面，但内心毫无波澜', role: 'an' },
+      { text: '不想去，但碍于面子还是去了，全程低调', role: 'wen' },
+      { text: '玩得最嗨，但第二天绝对不加班', role: 'hua' },
+      { text: '坐在角落观察所有人，掌握全组人际关系', role: 'su' },
+      { text: '找个借口没去，一个人去了咖啡馆', role: 'guo' }
+    ]
+  },
+  {
+    q: 'Q4. 绩效季来了，你的心态是？',
+    opts: [
+      { text: '提前整理好所有产出，主动找老板对齐预期', role: 'zhen' },
+      { text: '觉得自己做了很多，但不知道老板看不看得见', role: 'wen' },
+      { text: '已经打听好了谁会拿S，开始分析竞争格局', role: 'su' },
+      { text: '我的结果摆在那里，不需要解释', role: 'mei' },
+      { text: '焦虑到失眠，反复修改自评', role: 'an' },
+      { text: '绩效？那是什么，能吃吗', role: 'guo' }
+    ]
+  },
+  {
+    q: 'Q5. 老板在会议上当众否定了你的方案，你怎么办？',
+    opts: [
+      { text: '当场据理力争，把逻辑讲清楚', role: 'mei' },
+      { text: '先接受，会后单独找老板深聊，换个方式推进', role: 'zhen' },
+      { text: '脸色不太好看，但没说话', role: 'hua' },
+      { text: '点头称是，心里已经开始想下一步怎么搞', role: 'su' },
+      { text: '默默接受，回去改方案，不敢有意见', role: 'an' },
+      { text: '无所谓，反正我也不太在乎这个项目', role: 'guo' }
+    ]
+  },
+  {
+    q: 'Q6. 你们组来了个新人，能力很强，老板开始频繁夸他，你的感受是？',
+    opts: [
+      { text: '欣赏他，主动带他，建立良好关系', role: 'zhen' },
+      { text: '感到威胁，开始暗中较劲', role: 'an' },
+      { text: '无所谓，各做各的，不影响我', role: 'mei' },
+      { text: '直接问他"你之前做过什么项目"，摸清底细', role: 'hua' },
+      { text: '第一时间和他搞好关系，信息互通', role: 'su' },
+      { text: '替他高兴，顺便想想自己要不要换个方向', role: 'wen' }
+    ]
+  },
+  {
+    q: 'Q7. 深夜11点，老板发来消息"这个需求明天早上要"，你的反应是？',
+    opts: [
+      { text: '回"好的"，然后开始干', role: 'an' },
+      { text: '先问清楚优先级和背景，再决定要不要熬夜', role: 'zhen' },
+      { text: '已读，明天再说', role: 'guo' },
+      { text: '回"明天几点？"，争取一点缓冲', role: 'wen' },
+      { text: '直接打电话过去问清楚，效率第一', role: 'hua' },
+      { text: '已经睡了，明天看到再说', role: 'mei' }
+    ]
+  },
+  {
+    q: 'Q8. 公司要裁员，你所在的部门风声很紧，你会？',
+    opts: [
+      { text: '提前布局，和多个部门的人保持良好关系', role: 'zhen' },
+      { text: '打听消息，第一时间掌握内部动态', role: 'su' },
+      { text: '开始更新简历，做两手准备', role: 'mei' },
+      { text: '焦虑但不行动，每天刷脉脉', role: 'an' },
+      { text: '无所谓，大不了出去走走', role: 'guo' },
+      { text: '相信自己的价值，静待结果', role: 'wen' }
+    ]
+  },
+  {
+    q: 'Q9. 你理想中的工作状态是？',
+    opts: [
+      { text: '有挑战、有成长、能实现自我价值，哪怕辛苦也值得', role: 'zhen' },
+      { text: '做自己认为对的事，不委屈自己', role: 'mei' },
+      { text: '稳定、被认可、不要有太多变化', role: 'an' },
+      { text: '我说了算，资源我来调配', role: 'hua' },
+      { text: '自由，不被管，做喜欢的事', role: 'guo' },
+      { text: '默默做好本职，不争不抢', role: 'wen' },
+      { text: '信息通畅，关系顺畅，左右逢源', role: 'su' }
+    ]
+  },
+  {
+    q: 'Q10. 同事聚餐，有人开始说老板坏话，你会？',
+    opts: [
+      { text: '笑而不语，听着就好', role: 'su' },
+      { text: '直接说"我觉得他有些地方确实有问题"', role: 'mei' },
+      { text: '转移话题，不参与这种讨论', role: 'zhen' },
+      { text: '带头吐槽，说得最起劲', role: 'hua' },
+      { text: '跟着笑，但不发表意见', role: 'an' },
+      { text: '心不在焉，在想别的事', role: 'guo' }
+    ]
+  }
+];
+
+// 皇帝彩蛋：Q1-C, Q3-D, Q5-C, Q7-E, Q10-D
+const EMPEROR_PATTERN = { 0: 2, 2: 3, 4: 2, 6: 4, 9: 3 }; // qIndex: optIndex
+
+let current = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+let scores = {};
+
+function startQuiz() {
+  document.getElementById('start-page').style.display = 'none';
+  document.getElementById('quiz-page').style.display = 'block';
+  renderQuestion(0);
+}
+
+function renderQuestion(idx) {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+
+  const q = QUESTIONS[idx];
+  const card = document.createElement('div');
+  card.className = 'question-card active';
+
+  const letters = ['A','B','C','D','E','F','G'];
+  let optsHtml = q.opts.map((o, i) => `
+    <div class="option ${answers[idx] === i ? 'selected' : ''}" onclick="selectOpt(${idx}, ${i})">
+      <span class="opt-letter">${letters[i]}</span>
+      <span class="opt-text">${o.text}</span>
+    </div>
+  `).join('');
+
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div class="q-number">${idx+1}</div>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="options">${optsHtml}</div>
+  `;
+
+  container.appendChild(card);
+  updateProgress(idx);
+  updateButtons(idx);
+}
+
+function selectOpt(qIdx, optIdx) {
+  answers[qIdx] = optIdx;
+  renderQuestion(qIdx);
+}
+
+function updateProgress(idx) {
+  const pct = ((idx + (answers[idx] !== null ? 1 : 0)) / QUESTIONS.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `第 ${idx+1} / ${QUESTIONS.length} 题`;
+}
+
+function updateButtons(idx) {
+  const btnNext = document.getElementById('btn-next');
+  const btnPrev = document.getElementById('btn-prev');
+  btnPrev.style.display = idx > 0 ? 'inline-block' : 'none';
+  btnNext.disabled = answers[idx] === null;
+  btnNext.textContent = idx === QUESTIONS.length - 1 ? '查看结果 ✨' : '下一题 →';
+}
+
+function nextQ() {
+  if (answers[current] === null) return;
+  if (current < QUESTIONS.length - 1) {
+    current++;
+    renderQuestion(current);
+  } else {
+    showResult();
+  }
+}
+
+function prevQ() {
+  if (current > 0) {
+    current--;
+    renderQuestion(current);
+  }
+}
+
+function checkEmperor() {
+  for (const [qIdx, optIdx] of Object.entries(EMPEROR_PATTERN)) {
+    if (answers[parseInt(qIdx)] !== optIdx) return false;
+  }
+  return true;
+}
+
+function showResult() {
+  // 计算分数
+  scores = {};
+  Object.keys(ROLES).forEach(r => scores[r] = 0);
+  answers.forEach((ans, qIdx) => {
+    if (ans !== null) {
+      const role = QUESTIONS[qIdx].opts[ans].role;
+      scores[role] = (scores[role] || 0) + 1;
+    }
+  });
+
+  // 检查皇帝彩蛋
+  let winner;
+  if (checkEmperor()) {
+    winner = 'emperor';
+  } else {
+    winner = Object.entries(scores).reduce((a, b) => b[1] > a[1] ? b : a)[0];
+  }
+
+  const role = ROLES[winner];
+  const desc = DESCS[winner];
+
+  // 排序显示分数（不含皇帝）
+  const mainRoles = ['zhen','mei','an','hua','guo','wen','su'];
+  const maxScore = Math.max(...mainRoles.map(r => scores[r] || 0));
+  const scoreBars = mainRoles.map(r => {
+    const s = scores[r] || 0;
+    const pct = maxScore > 0 ? (s / maxScore * 100) : 0;
+    return `
+      <div class="score-row">
+        <span class="score-name">${ROLES[r].emoji} ${ROLES[r].name}</span>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+        <span class="score-num">${s}</span>
+      </div>
+    `;
+  }).join('');
+
+  const tagsHtml = role.tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+  const easterEgg = winner !== 'emperor' ? `
+    <div class="easter-egg">
+      🎭 <strong>彩蛋提示：</strong>如果你在Q1选C、Q3选D、Q5选C、Q7选E、Q10选D，
+      恭喜你解锁隐藏角色——<strong>皇帝</strong>！你不是在打工，你是在管人！
+    </div>
+  ` : '';
+
+  document.getElementById('quiz-page').style.display = 'none';
+  document.getElementById('result-page').style.display = 'block';
+
+  document.getElementById('result-content').innerHTML = `
+    <div class="result-role">你的职场人格是</div>
+    <span class="result-emoji">${role.emoji}</span>
+    <div class="result-name">${role.name}</div>
+    <div class="result-title">${role.title}</div>
+    <div class="result-divider"></div>
+    <div class="result-desc">${desc}</div>
+    <div class="result-tags">${tagsHtml}</div>
+    <div class="score-breakdown">
+      <h3>— 各角色得分 —</h3>
+      ${scoreBars}
+    </div>
+    ${easterEgg}
+  `;
+
+  // 动画触发
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(el => {
+      el.style.width = el.style.width;
+    });
+  }, 100);
+
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('progress-label').textContent = '测试完成！';
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = new Array(QUESTIONS.length).fill(null);
+  scores = {};
+  document.getElementById('result-page').style.display = 'none';
+  document.getElementById('quiz-page').style.display = 'block';
+  renderQuestion(0);
+}
+</script>
+</body>
+</html>
